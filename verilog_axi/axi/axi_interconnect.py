@@ -336,3 +336,13 @@ class AXIInterconnect(Module):
         platform.add_source(os.path.join(rtl_dir, "arbiter.v"))
         platform.add_source(os.path.join(rtl_dir, "priority_encoder.v"))
         platform.add_source(os.path.join(rtl_dir, "axi_interconnect.v"))
+
+
+class AXIInterconnectWrapper(Module):
+    def __init__(self, masters, slaves, register=False, timeout_cycles=1e6, *args, **kwargs):
+        ic = AXIInterconnect(kwargs['platform'])
+        for m in masters:
+            ic.add_slave(s_axi=m)
+        for region, s in slaves:
+            ic.add_master(m_axi=s, origin=region.origin, size=region.size)
+        self.submodules += ic
